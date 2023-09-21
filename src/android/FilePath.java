@@ -51,6 +51,22 @@ public class FilePath extends CordovaPlugin {
 
     protected void getReadPermission(int requestCode) {
         PermissionHelper.requestPermission(this, requestCode, READ);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            PermissionHelper.requestPermissions(this, requestCode, 
+            new String[]{Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_MEDIA_AUDIO});
+        } else {
+            PermissionHelper.requestPermission(this, requestCode, READ);
+        }
+    }
+
+    private boolean hasReadPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return PermissionHelper.hasPermission(this, Manifest.permission.READ_MEDIA_IMAGES) 
+                && PermissionHelper.hasPermission(this, Manifest.permission.READ_MEDIA_VIDEO)
+                && PermissionHelper.hasPermission(this, Manifest.permission.READ_MEDIA_AUDIO);
+          } else {
+            return PermissionHelper.hasPermission(this, READ);
+          }
     }
 
     public void initialize(CordovaInterface cordova, final CordovaWebView webView) {
@@ -71,7 +87,7 @@ public class FilePath extends CordovaPlugin {
         this.uriStr = args.getString(0);
 
         if (action.equals("resolveNativePath")) {
-            if (PermissionHelper.hasPermission(this, READ)) {
+            if (hasReadPermission()) {
                 resolveNativePath();
             }
             else {
