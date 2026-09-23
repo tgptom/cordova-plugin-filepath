@@ -1,3 +1,11 @@
+# 1.7.0
+
+* Modernized Android implementation for Cordova Android 14/15 compatibility.
+* Removed deprecated `PermissionHelper` usage and manifest media/storage permissions.
+* Added scoped-storage-friendly cache-copy fallback for unreadable `content://` paths.
+* Hardened document/download URI parsing and resource handling.
+* Added CI workflow to validate sample plugin builds against `cordova-android@14` and `cordova-android@15`.
+
 # 1.6.0
 
 * [#70](https://github.com/hiddentao/cordova-plugin-filepath/pull/70)

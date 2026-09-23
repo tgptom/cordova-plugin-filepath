@@ -27,7 +27,11 @@ window.FilePath.resolveNativePath('content://...', successCallback, errorCallbac
 ```
 
 ##### successCallback
-Returns the ``file://`` file path.
+Returns a ``file://`` path.
+
+On modern Android versions, direct filesystem paths are not always available for
+`content://` URIs. In those cases this plugin copies the URI contents into the
+app cache directory and returns that cache file path instead.
 
 ##### errorCallback
 Returns the following object:
@@ -37,7 +41,21 @@ Returns the following object:
 Possible error codes are:
 * ``-1`` - describes an invalid action
 * ``0`` - ``file://`` path could not be resolved
-* ``1`` - the native path links to a cloud file (e.g: from Google Drive app)
+* ``1`` - a cloud-backed URI could not be read and copied
+
+## Android scoped-storage notes
+
+* The plugin no longer requests broad media/storage permissions in the manifest.
+  It relies on URI grants from the caller for `content://` URIs.
+* Cache-copy fallback files are created under the app cache directory. These
+  files are app-private and may be removed by the OS at any time.
+
+## Compatibility
+
+Validated with Cordova Android platform versions:
+
+* `cordova-android@14`
+* `cordova-android@15`
 
 ## LICENSE
 
