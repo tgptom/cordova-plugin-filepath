@@ -1,0 +1,61 @@
+name: Android compatibility
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  cordova-android-build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - cordova_android: 14.0.0
+            node: 20.19.0
+            android_platform: android-35
+            build_tools: 35.0.0
+          - cordova_android: 15.0.0
+            node: 22.11.0
+            android_platform: android-36
+            build_tools: 36.0.0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager \
+            "platform-tools" \
+            "platforms;${{ matrix.android_platform }}" \
+            "build-tools;${{ matrix.build_tools }}"
+
+      - name: Install plugin dependencies
+        run: npm ci
+
+      - name: Build sample app with plugin
+        run: |
+          npx cordova@12 create /tmp/filepath-sample io.cordova.filepathsample FilePathSample
+          cd /tmp/filepath-sample
+          npx cordova platform add android@${{ matrix.cordova_android }}
+          npx cordova plugin add "${GITHUB_WORKSPACE}"
+          npx cordova build android --debug --no-telemetry
