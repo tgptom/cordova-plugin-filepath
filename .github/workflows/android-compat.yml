@@ -6,6 +6,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   cordova-android-build:
     runs-on: ubuntu-latest
